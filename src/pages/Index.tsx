@@ -168,33 +168,34 @@ export default function Index() {
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="name">Ваше имя</Label>
-                      <Input id="name" placeholder="Иван Иванов" required />
+                      <Input id="name" name="name" placeholder="Иван Иванов" required />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="phone">Телефон</Label>
-                      <Input id="phone" type="tel" placeholder="+7 (999) 123-45-67" required />
+                      <Input id="phone" name="phone" type="tel" placeholder="+7 (999) 123-45-67" required />
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="example@mail.com" required />
+                    <Input id="email" name="email" type="email" placeholder="example@mail.com" required />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="address">Адрес уборки</Label>
-                    <Input id="address" placeholder="г. Москва, ул. Примерная, д. 1, кв. 10" required />
+                    <Input id="address" name="address" placeholder="г. Москва, ул. Примерная, д. 1, кв. 10" required />
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="area">Площадь помещения (м²)</Label>
-                      <Input id="area" type="number" placeholder="50" required />
+                      <Input id="area" name="area" type="number" placeholder="50" required />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="service">Тип уборки</Label>
                       <select 
-                        id="service" 
+                        id="service"
+                        name="service"
                         className="w-full h-10 px-3 rounded-md border border-input bg-background"
                         required
                       >
@@ -210,7 +211,8 @@ export default function Index() {
                   <div className="space-y-2">
                     <Label htmlFor="comment">Комментарий</Label>
                     <Textarea 
-                      id="comment" 
+                      id="comment"
+                      name="comment"
                       placeholder="Дополнительные пожелания или особенности объекта"
                       rows={4}
                     />

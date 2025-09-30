@@ -137,13 +137,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         elif method == 'POST':
             body_data = json.loads(event.get('body', '{}'))
             
-            name = body_data.get('name', '')
-            phone = body_data.get('phone', '')
-            email = body_data.get('email', '')
-            address = body_data.get('address', '')
-            area = body_data.get('area', 0)
-            service_type = body_data.get('serviceType', '')
-            comment = body_data.get('comment', '')
+            name = body_data.get('name') or ''
+            phone = body_data.get('phone') or ''
+            email = body_data.get('email') or ''
+            address = body_data.get('address') or ''
+            area = body_data.get('area') or 0
+            service_type = body_data.get('serviceType') or ''
+            comment = body_data.get('comment') or ''
+            
+            if not all([name, phone, email, address, area, service_type]):
+                return {
+                    'statusCode': 400,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'All required fields must be filled'}),
+                    'isBase64Encoded': False
+                }
             
             cursor.execute(
                 "INSERT INTO bookings (name, phone, email, address, area, service_type, comment, status) "
