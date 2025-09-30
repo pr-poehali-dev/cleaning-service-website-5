@@ -79,7 +79,7 @@ export default function Admin() {
 
   const updateBookingStatus = async (id: number, newStatus: Booking['status']) => {
     try {
-      const response = await fetch(`${API_URL}/${id}`, {
+      const response = await fetch(`${API_URL}?id=${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -95,6 +95,13 @@ export default function Admin() {
           title: 'Статус обновлён',
           description: 'Изменения сохранены'
         });
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: 'Ошибка',
+          description: errorData.error || 'Не удалось обновить статус',
+          variant: 'destructive'
+        });
       }
     } catch (error) {
       toast({
@@ -107,8 +114,11 @@ export default function Admin() {
 
   const deleteBooking = async (id: number) => {
     try {
-      const response = await fetch(`${API_URL}/${id}`, {
-        method: 'DELETE'
+      const response = await fetch(`${API_URL}?id=${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
 
       if (response.ok) {
@@ -117,6 +127,13 @@ export default function Admin() {
         toast({
           title: 'Заявка удалена',
           description: 'Заявка успешно удалена из системы'
+        });
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: 'Ошибка',
+          description: errorData.error || 'Не удалось удалить заявку',
+          variant: 'destructive'
         });
       }
     } catch (error) {

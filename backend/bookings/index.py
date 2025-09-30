@@ -196,8 +196,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         elif method == 'PUT':
+            query_params = event.get('queryStringParameters', {})
             path_params = event.get('pathParams', {})
-            booking_id = path_params.get('id')
+            booking_id = query_params.get('id') or path_params.get('id')
+            
             if not booking_id:
                 return {
                     'statusCode': 400,
@@ -223,8 +225,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         elif method == 'DELETE':
+            query_params = event.get('queryStringParameters', {})
             path_params = event.get('pathParams', {})
-            booking_id = path_params.get('id')
+            booking_id = query_params.get('id') or path_params.get('id')
+            
             if not booking_id:
                 return {
                     'statusCode': 400,
