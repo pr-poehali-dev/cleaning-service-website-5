@@ -1,0 +1,25 @@
+{
+  "tests": [
+    {
+      "name": "Get all bookings",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Create booking",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "name": "Test User",
+        "phone": "+7 999 123-45-67",
+        "email": "test@example.com",
+        "address": "Test Address 123",
+        "area": 50,
+        "serviceType": "office",
+        "comment": "Test booking"
+      },
+      "expectedStatus": 201
+    }
+  ]
+}

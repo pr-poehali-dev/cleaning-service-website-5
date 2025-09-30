@@ -83,13 +83,50 @@ export default function Index() {
     });
   };
 
-  const handleBookingSubmit = (e: React.FormEvent) => {
+  const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: 'Заявка отправлена!',
-      description: 'Мы свяжемся с вами в ближайшее время',
-      duration: 5000
-    });
+    
+    const formData = new FormData(e.target as HTMLFormElement);
+    const bookingData = {
+      name: formData.get('name'),
+      phone: formData.get('phone'),
+      email: formData.get('email'),
+      address: formData.get('address'),
+      area: Number(formData.get('area')),
+      serviceType: formData.get('service'),
+      comment: formData.get('comment') || ''
+    };
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/efa2b104-cb77-4f2d-ac02-829e0e6ca609', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bookingData)
+      });
+
+      if (response.ok) {
+        toast({
+          title: 'Заявка отправлена!',
+          description: 'Мы свяжемся с вами в ближайшее время',
+          duration: 5000
+        });
+        (e.target as HTMLFormElement).reset();
+      } else {
+        toast({
+          title: 'Ошибка',
+          description: 'Не удалось отправить заявку. Попробуйте позже.',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось отправить заявку. Проверьте подключение к интернету.',
+        variant: 'destructive'
+      });
+    }
   };
 
   if (showDashboard && isLoggedIn) {
