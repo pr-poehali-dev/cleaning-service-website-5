@@ -19,6 +19,8 @@ interface Booking {
   comment: string;
   status: 'new' | 'in-progress' | 'completed' | 'cancelled';
   created_at: string;
+  booking_date?: string;
+  booking_time?: string;
 }
 
 const API_URL = 'https://functions.poehali.dev/efa2b104-cb77-4f2d-ac02-829e0e6ca609';
@@ -379,6 +381,32 @@ export default function Admin() {
                   </h4>
                   <p>{selectedBooking.created_at}</p>
                 </div>
+              </div>
+
+              {(selectedBooking.booking_date || selectedBooking.booking_time) && (
+                <div className="bg-primary/5 p-4 rounded-lg">
+                  <h4 className="font-semibold mb-3 flex items-center gap-2">
+                    <Icon name="Clock" size={16} className="text-primary" />
+                    Желаемое время уборки
+                  </h4>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {selectedBooking.booking_date && (
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Дата</p>
+                        <p className="text-lg font-medium">{new Date(selectedBooking.booking_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                      </div>
+                    )}
+                    {selectedBooking.booking_time && (
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Время</p>
+                        <p className="text-lg font-medium">{selectedBooking.booking_time}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div className="grid md:grid-cols-2 gap-4">
               </div>
 
               <div>

@@ -13,7 +13,28 @@ export default function Index() {
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [showRegisterDialog, setShowRegisterDialog] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
   const { toast } = useToast();
+
+  const getAvailableDates = () => {
+    const dates = [];
+    const today = new Date();
+    for (let i = 1; i <= 30; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      dates.push(date.toISOString().split('T')[0]);
+    }
+    return dates;
+  };
+
+  const getAvailableTimeSlots = () => {
+    return [
+      '09:00', '10:00', '11:00', '12:00', 
+      '13:00', '14:00', '15:00', '16:00', 
+      '17:00', '18:00'
+    ];
+  };
 
   const services = [
     {
@@ -210,15 +231,58 @@ export default function Index() {
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-4 bg-primary/5 p-4 rounded-lg">
+                    <h3 className="font-semibold flex items-center gap-2">
+                      <Icon name="Calendar" className="text-primary" size={20} />
+                      Выберите дату и время уборки
+                    </h3>
+                    
                     <div className="space-y-2">
-                      <Label htmlFor="date">Желаемая дата уборки</Label>
-                      <Input id="date" name="date" type="date" required />
+                      <Label htmlFor="date">Доступные даты</Label>
+                      <select
+                        id="date"
+                        name="date"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        className="w-full h-10 px-3 rounded-md border border-input bg-background"
+                        required
+                      >
+                        <option value="">Выберите дату</option>
+                        {getAvailableDates().map(date => {
+                          const dateObj = new Date(date);
+                          const formattedDate = dateObj.toLocaleDateString('ru-RU', { 
+                            day: 'numeric', 
+                            month: 'long',
+                            weekday: 'short'
+                          });
+                          return (
+                            <option key={date} value={date}>
+                              {formattedDate}
+                            </option>
+                          );
+                        })}
+                      </select>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="time">Желаемое время</Label>
-                      <Input id="time" name="time" type="time" required />
-                    </div>
+
+                    {selectedDate && (
+                      <div className="space-y-2 animate-fade-in">
+                        <Label htmlFor="time">Доступное время</Label>
+                        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                          {getAvailableTimeSlots().map(time => (
+                            <Button
+                              key={time}
+                              type="button"
+                              variant={selectedTime === time ? 'default' : 'outline'}
+                              className="h-12"
+                              onClick={() => setSelectedTime(time)}
+                            >
+                              {time}
+                            </Button>
+                          ))}
+                        </div>
+                        <input type="hidden" id="time" name="time" value={selectedTime} required />
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-2">
