@@ -39,6 +39,8 @@ def send_notification_email(booking_data: Dict[str, Any]) -> None:
             <p><strong>Адрес:</strong> {booking_data["address"]}</p>
             <p><strong>Площадь:</strong> {booking_data["area"]} м²</p>
             <p><strong>Тип услуги:</strong> {booking_data["service_type"]}</p>
+            {f'<p><strong>Желаемая дата:</strong> {booking_data["booking_date"]}</p>' if booking_data.get("booking_date") else ''}
+            {f'<p><strong>Желаемое время:</strong> {booking_data["booking_time"]}</p>' if booking_data.get("booking_time") else ''}
             {f'<p><strong>Комментарий:</strong> {booking_data["comment"]}</p>' if booking_data.get("comment") else ''}
           </div>
           
@@ -103,7 +105,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if booking_id:
                 cursor.execute(
                     "SELECT id, name, phone, email, address, area, service_type, comment, status, "
-                    "TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI') as created_at "
+                    "TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI') as created_at, "
+                    "TO_CHAR(booking_date, 'YYYY-MM-DD') as booking_date, "
+                    "TO_CHAR(booking_time, 'HH24:MI') as booking_time "
                     "FROM bookings WHERE id = " + str(int(booking_id))
                 )
                 booking = cursor.fetchone()
@@ -123,7 +127,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             else:
                 cursor.execute(
                     "SELECT id, name, phone, email, address, area, service_type, comment, status, "
-                    "TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI') as created_at "
+                    "TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI') as created_at, "
+                    "TO_CHAR(booking_date, 'YYYY-MM-DD') as booking_date, "
+                    "TO_CHAR(booking_time, 'HH24:MI') as booking_time "
                     "FROM bookings ORDER BY created_at DESC"
                 )
                 bookings = cursor.fetchall()
@@ -144,8 +150,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             area = body_data.get('area') or 0
             service_type = body_data.get('serviceType') or ''
             comment = body_data.get('comment') or ''
+            booking_date = body_data.get('date') or ''
+            booking_time = body_data.get('time') or ''
             
-            if not all([name, phone, email, address, area, service_type]):
+            if not all([name, phone, email, address, area, service_type, booking_date, booking_time]):
                 return {
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
@@ -154,10 +162,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             cursor.execute(
-                "INSERT INTO bookings (name, phone, email, address, area, service_type, comment, status) "
+                "INSERT INTO bookings (name, phone, email, address, area, service_type, comment, status, booking_date, booking_time) "
                 "VALUES ('" + name.replace("'", "''") + "', '" + phone.replace("'", "''") + "', '" + 
                 email.replace("'", "''") + "', '" + address.replace("'", "''") + "', " + str(int(area)) + 
-                ", '" + service_type.replace("'", "''") + "', '" + comment.replace("'", "''") + "', 'new') "
+                ", '" + service_type.replace("'", "''") + "', '" + comment.replace("'", "''") + "', 'new', '" + 
+                booking_date.replace("'", "''") + "', '" + booking_time.replace("'", "''") + "') "
                 "RETURNING id"
             )
             result = cursor.fetchone()
@@ -173,7 +182,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'address': address,
                 'area': area,
                 'service_type': service_type,
-                'comment': comment
+                'comment': comment,
+                'booking_date': booking_date,
+                'booking_time': booking_time
             }
             send_notification_email(booking_notification_data)
             

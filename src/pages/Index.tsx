@@ -94,7 +94,9 @@ export default function Index() {
       address: formData.get('address'),
       area: Number(formData.get('area')),
       serviceType: formData.get('service'),
-      comment: formData.get('comment') || ''
+      comment: formData.get('comment') || '',
+      date: formData.get('date'),
+      time: formData.get('time')
     };
 
     try {
@@ -205,6 +207,17 @@ export default function Index() {
                         <option value="renovation">После ремонта</option>
                         <option value="furniture">Химчистка мебели</option>
                       </select>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="date">Желаемая дата уборки</Label>
+                      <Input id="date" name="date" type="date" required />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="time">Желаемое время</Label>
+                      <Input id="time" name="time" type="time" required />
                     </div>
                   </div>
 
