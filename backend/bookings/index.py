@@ -3,6 +3,63 @@ import os
 from typing import Dict, Any, List
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+def send_notification_email(booking_data: Dict[str, Any]) -> None:
+    '''Отправка email уведомления администратору о новой заявке'''
+    smtp_host = os.environ.get('SMTP_HOST')
+    smtp_port = os.environ.get('SMTP_PORT', '587')
+    smtp_user = os.environ.get('SMTP_USER')
+    smtp_password = os.environ.get('SMTP_PASSWORD')
+    admin_email = os.environ.get('ADMIN_EMAIL')
+    
+    if not all([smtp_host, smtp_user, smtp_password, admin_email]):
+        return
+    
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = f'Новая заявка на уборку #{booking_data["id"]}'
+    msg['From'] = smtp_user
+    msg['To'] = admin_email
+    
+    html_content = f'''
+    <html>
+      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; border-radius: 10px;">
+          <h2 style="color: #00BCD4; border-bottom: 2px solid #00BCD4; padding-bottom: 10px;">
+            Новая заявка на уборку
+          </h2>
+          
+          <div style="background-color: white; padding: 20px; border-radius: 8px; margin-top: 20px;">
+            <p><strong>Номер заявки:</strong> #{booking_data["id"]}</p>
+            <p><strong>Клиент:</strong> {booking_data["name"]}</p>
+            <p><strong>Телефон:</strong> {booking_data["phone"]}</p>
+            <p><strong>Email:</strong> {booking_data["email"]}</p>
+            <p><strong>Адрес:</strong> {booking_data["address"]}</p>
+            <p><strong>Площадь:</strong> {booking_data["area"]} м²</p>
+            <p><strong>Тип услуги:</strong> {booking_data["service_type"]}</p>
+            {f'<p><strong>Комментарий:</strong> {booking_data["comment"]}</p>' if booking_data.get("comment") else ''}
+          </div>
+          
+          <div style="margin-top: 20px; padding: 15px; background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
+            <p style="margin: 0;">⚠️ Не забудьте связаться с клиентом в ближайшее время!</p>
+          </div>
+        </div>
+      </body>
+    </html>
+    '''
+    
+    msg.attach(MIMEText(html_content, 'html'))
+    
+    try:
+        server = smtplib.SMTP(smtp_host, int(smtp_port))
+        server.starttls()
+        server.login(smtp_user, smtp_password)
+        server.send_message(msg)
+        server.quit()
+    except Exception as e:
+        pass
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
@@ -98,10 +155,24 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             result = cursor.fetchone()
             conn.commit()
             
+            booking_id = result['id']
+            
+            booking_notification_data = {
+                'id': booking_id,
+                'name': name,
+                'phone': phone,
+                'email': email,
+                'address': address,
+                'area': area,
+                'service_type': service_type,
+                'comment': comment
+            }
+            send_notification_email(booking_notification_data)
+            
             return {
                 'statusCode': 201,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'id': result['id'], 'message': 'Booking created successfully'}),
+                'body': json.dumps({'id': booking_id, 'message': 'Booking created successfully'}),
                 'isBase64Encoded': False
             }
         
