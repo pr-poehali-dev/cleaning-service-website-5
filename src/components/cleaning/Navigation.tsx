@@ -29,27 +29,28 @@ export default function Navigation({
 }: NavigationProps) {
   return (
     <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <Icon name="Sparkles" className="text-primary" size={32} />
-          <h1 className="text-2xl font-bold text-primary">CleanPro</h1>
+      <div className="container mx-auto px-4 py-3 sm:py-4 flex justify-between items-center">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <Icon name="Sparkles" className="text-primary" size={24} />
+          <h1 className="text-lg sm:text-2xl font-bold text-primary">CleanPro</h1>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2 sm:gap-3">
           {isLoggedIn ? (
             <>
-              <Button onClick={() => setShowDashboard(true)}>
-                <Icon name="User" size={18} className="mr-2" />
-                Личный кабинет
+              <Button onClick={() => setShowDashboard(true)} size="sm" className="text-xs sm:text-sm">
+                <Icon name="User" size={16} className="mr-1 sm:mr-2" />
+                <span className="hidden xs:inline">Личный кабинет</span>
+                <span className="xs:hidden">Кабинет</span>
               </Button>
-              <Button variant="ghost" onClick={() => setIsLoggedIn(false)}>
-                <Icon name="LogOut" size={18} />
+              <Button variant="ghost" size="sm" onClick={() => setIsLoggedIn(false)}>
+                <Icon name="LogOut" size={16} />
               </Button>
             </>
           ) : (
             <>
               <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
                 <DialogTrigger asChild>
-                  <Button variant="outline">Войти</Button>
+                  <Button variant="outline" size="sm" className="text-xs sm:text-sm">Войти</Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
@@ -72,7 +73,7 @@ export default function Navigation({
 
               <Dialog open={showRegisterDialog} onOpenChange={setShowRegisterDialog}>
                 <DialogTrigger asChild>
-                  <Button>Регистрация</Button>
+                  <Button size="sm" className="text-xs sm:text-sm">Регистрация</Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
