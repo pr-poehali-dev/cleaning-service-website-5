@@ -6,7 +6,7 @@ import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 
 interface LoginFormProps {
-  onLogin: () => void;
+  onLogin: (userId: number, userRole: string) => void;
 }
 
 export default function LoginForm({ onLogin }: LoginFormProps) {
@@ -16,7 +16,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === 'admin') {
-      onLogin();
+      onLogin(1, 'super_admin');
       toast({
         title: 'Успешный вход',
         description: 'Добро пожаловать в админ-панель'

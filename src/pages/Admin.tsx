@@ -188,7 +188,13 @@ export default function Admin() {
   };
 
   if (!isAuthenticated) {
-    return <LoginForm onLogin={() => setIsAuthenticated(true)} />;
+    return <LoginForm 
+      onLogin={(userId: number, userRole: string) => {
+        setCurrentUserId(userId);
+        setCurrentUserRole(userRole);
+        setIsAuthenticated(true);
+      }} 
+    />;
   }
 
   return (
