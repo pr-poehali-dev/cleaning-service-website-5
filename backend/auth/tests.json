@@ -1,0 +1,46 @@
+{
+  "tests": [
+    {
+      "name": "Успешная аутентификация администратора",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "username": "admin",
+        "password": "admin"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "id": 1,
+        "username": "admin"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Неверные учетные данные",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "username": "admin",
+        "password": "wrongpassword"
+      },
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Отсутствуют обязательные поля",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "username": ""
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

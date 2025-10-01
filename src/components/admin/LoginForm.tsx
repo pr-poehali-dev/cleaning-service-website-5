@@ -9,24 +9,50 @@ interface LoginFormProps {
   onLogin: (userId: number, userRole: string) => void;
 }
 
+const AUTH_API_URL = 'https://functions.poehali.dev/07a5a039-979c-4a7c-a481-9eeb2c0fe91e';
+
 export default function LoginForm({ onLogin }: LoginFormProps) {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'admin') {
-      onLogin(1, 'super_admin');
-      toast({
-        title: 'Успешный вход',
-        description: 'Добро пожаловать в админ-панель'
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(AUTH_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
       });
-    } else {
+
+      const data = await response.json();
+
+      if (response.ok) {
+        onLogin(data.id, data.role);
+        toast({
+          title: 'Успешный вход',
+          description: `Добро пожаловать, ${data.full_name}`
+        });
+      } else {
+        toast({
+          title: 'Ошибка входа',
+          description: data.error || 'Неверные учетные данные',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
       toast({
-        title: 'Ошибка входа',
-        description: 'Неверный пароль',
+        title: 'Ошибка',
+        description: 'Не удалось подключиться к серверу',
         variant: 'destructive'
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -44,18 +70,30 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Input
+                type="text"
+                placeholder="Имя пользователя"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="text-lg"
+                required
+                autoComplete="username"
+              />
+            </div>
+            <div className="space-y-2">
+              <Input
                 type="password"
                 placeholder="Пароль"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="text-lg"
                 required
+                autoComplete="current-password"
               />
-              <p className="text-xs text-muted-foreground">Подсказка: admin</p>
+              <p className="text-xs text-muted-foreground">По умолчанию: admin / admin</p>
             </div>
-            <Button type="submit" size="lg" className="w-full">
+            <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
               <Icon name="LogIn" size={20} className="mr-2" />
-              Войти
+              {isLoading ? 'Вход...' : 'Войти'}
             </Button>
           </form>
         </CardContent>
