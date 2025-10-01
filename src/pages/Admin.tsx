@@ -29,6 +29,7 @@ export default function Admin() {
   const fetchBookings = async () => {
     setIsLoading(true);
     try {
+      console.log('Fetching bookings with:', { currentUserId, currentUserRole });
       const response = await fetch(API_URL, {
         headers: {
           'X-User-Id': currentUserId.toString(),
@@ -37,9 +38,13 @@ export default function Admin() {
       });
       if (response.ok) {
         const data = await response.json();
+        console.log('Bookings received:', data.length);
         setBookings(data);
+      } else {
+        console.error('Failed to fetch bookings:', response.status);
       }
     } catch (error) {
+      console.error('Error fetching bookings:', error);
       toast({
         title: 'Ошибка',
         description: 'Не удалось загрузить заявки',
@@ -64,10 +69,11 @@ export default function Admin() {
 
   useEffect(() => {
     if (isAuthenticated && currentUserId) {
+      console.log('Fetching data for user:', currentUserId, currentUserRole);
       fetchBookings();
       fetchUsers();
     }
-  }, [isAuthenticated, currentUserId, currentUserRole]);
+  }, [isAuthenticated]);
 
   const updateBookingStatus = async (id: number, newStatus: Booking['status']) => {
     try {
@@ -190,12 +196,15 @@ export default function Admin() {
   if (!isAuthenticated) {
     return <LoginForm 
       onLogin={(userId: number, userRole: string) => {
+        console.log('Login successful:', { userId, userRole });
         setCurrentUserId(userId);
         setCurrentUserRole(userRole);
         setIsAuthenticated(true);
       }} 
     />;
   }
+  
+  console.log('Admin render:', { isAuthenticated, currentUserId, currentUserRole, bookingsCount: bookings.length });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
