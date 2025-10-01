@@ -18,11 +18,12 @@ interface BookingsTableProps {
 const getStatusBadge = (status: Booking['status']) => {
   const variants: Record<string, { variant: any; label: string; color: string }> = {
     'new': { variant: 'default', label: 'Новая', color: 'bg-blue-500' },
+    'assigned': { variant: 'secondary', label: 'Назначена', color: 'bg-purple-500' },
     'in-progress': { variant: 'secondary', label: 'В работе', color: 'bg-yellow-500' },
     'completed': { variant: 'outline', label: 'Выполнена', color: 'bg-green-500' },
     'cancelled': { variant: 'destructive', label: 'Отменена', color: 'bg-red-500' }
   };
-  const config = variants[status];
+  const config = variants[status] || { variant: 'default', label: status, color: 'bg-gray-500' };
   return <Badge variant={config.variant}>{config.label}</Badge>;
 };
 
@@ -70,6 +71,7 @@ export default function BookingsTable({
           >
             <option value="all">Все статусы</option>
             <option value="new">Новые</option>
+            <option value="assigned">Назначена</option>
             <option value="in-progress">В работе</option>
             <option value="completed">Выполнено</option>
             <option value="cancelled">Отменено</option>
