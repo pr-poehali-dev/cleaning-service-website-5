@@ -67,7 +67,7 @@ export default function Admin() {
       fetchBookings();
       fetchUsers();
     }
-  }, [isAuthenticated, currentUserId, currentUserRole]);
+  }, [isAuthenticated]);
 
   const updateBookingStatus = async (id: number, newStatus: Booking['status']) => {
     try {
@@ -115,19 +115,12 @@ export default function Admin() {
       });
 
       if (response.ok) {
-        const assignee = assigneeId ? users.find(u => u.id === assigneeId) : null;
-        setBookings(bookings.map(b => 
-          b.id === id ? { 
-            ...b, 
-            assignee_id: assigneeId, 
-            assignee_name: assignee?.full_name || null,
-            status: assigneeId ? 'assigned' : b.status
-          } : b
-        ));
+        await fetchBookings();
         toast({
           title: 'Ответственный обновлён',
           description: assigneeId ? 'Ответственный назначен' : 'Ответственный удалён'
         });
+        const assignee = assigneeId ? users.find(u => u.id === assigneeId) : null;
         if (selectedBooking && selectedBooking.id === id) {
           setSelectedBooking({
             ...selectedBooking,
