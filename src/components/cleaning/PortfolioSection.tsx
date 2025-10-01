@@ -3,20 +3,20 @@ import Icon from '@/components/ui/icon';
 
 const beforeAfter = [
   {
-    before: '/img/546498b2-e1ae-46a6-bbdd-4a0e3d9bd26c.jpg',
-    after: '/img/2ddd0761-4380-473d-aee3-afe42340cba5.jpg',
+    before: 'https://cdn.poehali.dev/files/546498b2-e1ae-46a6-bbdd-4a0e3d9bd26c.jpg',
+    after: 'https://cdn.poehali.dev/files/2ddd0761-4380-473d-aee3-afe42340cba5.jpg',
     title: 'Офисное помещение',
     description: 'Генеральная уборка офиса 80 м²'
   },
   {
-    before: '/img/cae99f40-901d-4773-81d8-a45477c41873.jpg',
-    after: '/img/90e32f9d-656b-4f20-9b51-48a6107b0d07.jpg',
+    before: 'https://cdn.poehali.dev/files/cae99f40-901d-4773-81d8-a45477c41873.jpg',
+    after: 'https://cdn.poehali.dev/files/90e32f9d-656b-4f20-9b51-48a6107b0d07.jpg',
     title: 'Гостиная',
     description: 'Химчистка мебели и глубокая уборка'
   },
   {
-    before: '/img/335c7f3a-b939-4215-a33d-750d8d45180c.jpg',
-    after: '/img/e13d2d9e-5245-41c2-9df2-035d16976c82.jpg',
+    before: 'https://cdn.poehali.dev/files/335c7f3a-b939-4215-a33d-750d8d45180c.jpg',
+    after: 'https://cdn.poehali.dev/files/e13d2d9e-5245-41c2-9df2-035d16976c82.jpg',
     title: 'Кухня',
     description: 'Уборка после ремонта'
   }

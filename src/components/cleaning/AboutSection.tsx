@@ -4,9 +4,9 @@ export default function AboutSection() {
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 items-center">
           <div className="animate-fade-in">
-            <img 
-              src="/img/bdef7af6-032c-44ed-9508-e5ba24733ae0.jpg" 
-              alt="Наша команда" 
+            <img
+              src="https://cdn.poehali.dev/files/bdef7af6-032c-44ed-9508-e5ba24733ae0.jpg"
+              alt="Наша команда"
               className="rounded-2xl shadow-xl w-full h-auto object-cover"
             />
           </div>

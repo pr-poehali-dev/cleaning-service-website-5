@@ -32,9 +32,9 @@ export default function HeroSection({ isLoggedIn, setShowDashboard, setShowRegis
             </div>
           </div>
           <div className="animate-scale-in order-first lg:order-last">
-            <img 
-              src="/img/0c244d59-f0c1-4dff-b054-4e98efecce46.jpg" 
-              alt="Профессиональная уборка" 
+            <img
+              src="https://cdn.poehali.dev/files/0c244d59-f0c1-4dff-b054-4e98efecce46.jpg"
+              alt="Профессиональная уборка"
               className="rounded-2xl shadow-2xl w-full h-auto object-cover max-h-[300px] sm:max-h-[400px] lg:max-h-none"
             />
           </div>
