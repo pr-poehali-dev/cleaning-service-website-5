@@ -90,6 +90,7 @@ export default function BookingsTable({
                 <TableHead>Площадь</TableHead>
                 <TableHead>Тип услуги</TableHead>
                 <TableHead>Статус</TableHead>
+                <TableHead>Ответственный</TableHead>
                 <TableHead>Дата</TableHead>
                 <TableHead>Действия</TableHead>
               </TableRow>
@@ -97,7 +98,7 @@ export default function BookingsTable({
             <TableBody>
               {filteredBookings.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                     Заявки не найдены
                   </TableCell>
                 </TableRow>
@@ -116,6 +117,16 @@ export default function BookingsTable({
                     <TableCell>{booking.area} м²</TableCell>
                     <TableCell>{booking.service_type}</TableCell>
                     <TableCell>{getStatusBadge(booking.status)}</TableCell>
+                    <TableCell className="text-sm">
+                      {booking.assignee_name ? (
+                        <Badge variant="outline" className="gap-1">
+                          <Icon name="User" size={12} />
+                          {booking.assignee_name}
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground text-xs">Не назначен</span>
+                      )}
+                    </TableCell>
                     <TableCell className="text-sm text-muted-foreground">{booking.created_at}</TableCell>
                     <TableCell>
                       <Button
