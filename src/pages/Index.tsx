@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import Navigation from '@/components/cleaning/Navigation';
-import DashboardView from '@/components/cleaning/DashboardView';
-import HeroSection from '@/components/cleaning/HeroSection';
-import ServicesSection from '@/components/cleaning/ServicesSection';
-import AboutSection from '@/components/cleaning/AboutSection';
-import PortfolioSection from '@/components/cleaning/PortfolioSection';
-import ReviewsSection from '@/components/cleaning/ReviewsSection';
-import ContactsSection from '@/components/cleaning/ContactsSection';
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import Navigation from "@/components/cleaning/Navigation";
+import DashboardView from "@/components/cleaning/DashboardView";
+import HeroSection from "@/components/cleaning/HeroSection";
+import ServicesSection from "@/components/cleaning/ServicesSection";
+import AboutSection from "@/components/cleaning/AboutSection";
+import PortfolioSection from "@/components/cleaning/PortfolioSection";
+import ReviewsSection from "@/components/cleaning/ReviewsSection";
+import ContactsSection from "@/components/cleaning/ContactsSection";
 
 export default function Index() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -21,8 +21,8 @@ export default function Index() {
     setIsLoggedIn(true);
     setShowLoginDialog(false);
     toast({
-      title: 'Добро пожаловать!',
-      description: 'Вы успешно вошли в личный кабинет'
+      title: "Добро пожаловать!",
+      description: "Вы успешно вошли в личный кабинет",
     });
   };
 
@@ -31,14 +31,14 @@ export default function Index() {
     setIsLoggedIn(true);
     setShowRegisterDialog(false);
     toast({
-      title: 'Регистрация завершена!',
-      description: 'Добро пожаловать в CleanPro'
+      title: "Регистрация завершена!",
+      description: "Добро пожаловать в Top Clean Service",
     });
   };
 
   if (showDashboard && isLoggedIn) {
     return (
-      <DashboardView 
+      <DashboardView
         setShowDashboard={setShowDashboard}
         setIsLoggedIn={setIsLoggedIn}
       />
@@ -59,7 +59,7 @@ export default function Index() {
         handleRegister={handleRegister}
       />
 
-      <HeroSection 
+      <HeroSection
         isLoggedIn={isLoggedIn}
         setShowDashboard={setShowDashboard}
         setShowRegisterDialog={setShowRegisterDialog}
@@ -69,8 +69,8 @@ export default function Index() {
       <AboutSection />
       <PortfolioSection />
       <ReviewsSection />
-      
-      <ContactsSection 
+
+      <ContactsSection
         isLoggedIn={isLoggedIn}
         setShowDashboard={setShowDashboard}
         setShowRegisterDialog={setShowRegisterDialog}
@@ -78,7 +78,7 @@ export default function Index() {
 
       <footer className="py-8 bg-foreground/5 border-t">
         <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>&copy; 2025 CleanPro. Все права защищены.</p>
+          <p>&copy; 2025 Top Clean Service. Все права защищены.</p>
         </div>
       </footer>
     </div>
