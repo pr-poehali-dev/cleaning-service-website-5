@@ -7,10 +7,13 @@ import StatsCards from '@/components/admin/StatsCards';
 import BookingsTable from '@/components/admin/BookingsTable';
 import BookingDetailDialog from '@/components/admin/BookingDetailDialog';
 import DeleteConfirmDialog from '@/components/admin/DeleteConfirmDialog';
+import ServicesManager from '@/components/admin/ServicesManager';
 import { Booking, API_URL } from '@/components/admin/types';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [activeTab, setActiveTab] = useState('bookings');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
@@ -145,21 +148,40 @@ export default function Admin() {
       </nav>
 
       <main className="container mx-auto px-4 py-8">
-        <StatsCards
-          total={stats.total}
-          newCount={stats.new}
-          inProgress={stats.inProgress}
-          completed={stats.completed}
-        />
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+            <TabsTrigger value="bookings" className="flex items-center gap-2">
+              <Icon name="ClipboardList" size={18} />
+              Заявки
+            </TabsTrigger>
+            <TabsTrigger value="services" className="flex items-center gap-2">
+              <Icon name="Briefcase" size={18} />
+              Услуги
+            </TabsTrigger>
+          </TabsList>
 
-        <BookingsTable
-          bookings={bookings}
-          searchQuery={searchQuery}
-          statusFilter={statusFilter}
-          onSearchChange={setSearchQuery}
-          onStatusFilterChange={setStatusFilter}
-          onViewBooking={setSelectedBooking}
-        />
+          <TabsContent value="bookings" className="space-y-6">
+            <StatsCards
+              total={stats.total}
+              newCount={stats.new}
+              inProgress={stats.inProgress}
+              completed={stats.completed}
+            />
+
+            <BookingsTable
+              bookings={bookings}
+              searchQuery={searchQuery}
+              statusFilter={statusFilter}
+              onSearchChange={setSearchQuery}
+              onStatusFilterChange={setStatusFilter}
+              onViewBooking={setSelectedBooking}
+            />
+          </TabsContent>
+
+          <TabsContent value="services">
+            <ServicesManager />
+          </TabsContent>
+        </Tabs>
       </main>
 
       <BookingDetailDialog
