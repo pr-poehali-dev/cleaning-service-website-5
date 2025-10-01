@@ -11,7 +11,7 @@ export default function AboutSection() {
             />
           </div>
           <div>
-            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">О компании Top Clean</h3>
+            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">О компании Top Clean Service</h3>
             <div className="space-y-3 sm:space-y-4 text-base sm:text-lg text-muted-foreground">
               <p>
                 Мы — команда профессионалов с более чем 10-летним опытом в сфере клининговых услуг. 
