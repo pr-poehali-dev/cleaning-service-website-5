@@ -63,11 +63,11 @@ export default function Admin() {
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && currentUserId) {
       fetchBookings();
       fetchUsers();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, currentUserId, currentUserRole]);
 
   const updateBookingStatus = async (id: number, newStatus: Booking['status']) => {
     try {

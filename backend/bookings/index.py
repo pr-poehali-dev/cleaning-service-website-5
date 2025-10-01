@@ -103,6 +103,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             user_id = headers.get('X-User-Id')
             user_role = headers.get('X-User-Role')
             
+            print(f"DEBUG: user_id={user_id}, user_role={user_role}, headers={headers}")
+            
             path_params = event.get('pathParams', {})
             booking_id = path_params.get('id')
             
