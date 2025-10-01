@@ -32,7 +32,7 @@ export default function Navigation({
       <div className="container mx-auto px-4 py-3 sm:py-4 flex justify-between items-center">
         <div className="flex items-center gap-1.5 sm:gap-2">
           <Icon name="Sparkles" className="text-primary" size={24} />
-          <h1 className="text-lg sm:text-2xl font-bold text-primary">CleanPro</h1>
+          <h1 className="text-lg sm:text-2xl font-bold text-primary">Top Clean</h1>
         </div>
         <div className="flex gap-2 sm:gap-3">
           {isLoggedIn ? (
