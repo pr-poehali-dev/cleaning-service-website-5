@@ -1,20 +1,27 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
-import { Booking } from './types';
+import { Booking, User } from './types';
 
 interface BookingDetailDialogProps {
   booking: Booking | null;
   onClose: () => void;
   onStatusUpdate: (id: number, status: Booking['status']) => void;
+  onAssigneeUpdate: (id: number, assigneeId: number | null) => void;
   onDeleteClick: () => void;
+  users: User[];
+  currentUserRole: string;
 }
 
 export default function BookingDetailDialog({
   booking,
   onClose,
   onStatusUpdate,
-  onDeleteClick
+  onAssigneeUpdate,
+  onDeleteClick,
+  users,
+  currentUserRole
 }: BookingDetailDialogProps) {
   if (!booking) return null;
 
@@ -119,6 +126,41 @@ export default function BookingDetailDialog({
             </div>
           )}
 
+          {['super_admin', 'admin'].includes(currentUserRole) && (
+            <div>
+              <h4 className="font-semibold mb-3 flex items-center gap-2">
+                <Icon name="UserCheck" size={16} className="text-primary" />
+                Ответственный
+              </h4>
+              <Select
+                value={booking.assignee_id?.toString() || 'none'}
+                onValueChange={(value) => {
+                  const assigneeId = value === 'none' ? null : parseInt(value);
+                  onAssigneeUpdate(booking.id, assigneeId);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Выберите ответственного" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">
+                    <span className="text-gray-500">Не назначен</span>
+                  </SelectItem>
+                  {users.map((user) => (
+                    <SelectItem key={user.id} value={user.id.toString()}>
+                      {user.full_name} ({user.role === 'super_admin' ? 'Гл. администратор' : user.role === 'admin' ? 'Администратор' : user.role === 'manager' ? 'Менеджер' : 'Оператор'})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {booking.assignee_name && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  Текущий ответственный: <span className="font-medium">{booking.assignee_name}</span>
+                </p>
+              )}
+            </div>
+          )}
+
           <div>
             <h4 className="font-semibold mb-3">Изменить статус</h4>
             <div className="flex flex-wrap gap-2">
@@ -127,6 +169,12 @@ export default function BookingDetailDialog({
                 onClick={() => onStatusUpdate(booking.id, 'new')}
               >
                 Новая
+              </Button>
+              <Button
+                variant={booking.status === 'assigned' ? 'default' : 'outline'}
+                onClick={() => onStatusUpdate(booking.id, 'assigned')}
+              >
+                Назначен ответственный
               </Button>
               <Button
                 variant={booking.status === 'in-progress' ? 'default' : 'outline'}

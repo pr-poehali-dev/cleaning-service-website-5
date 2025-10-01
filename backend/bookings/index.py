@@ -78,7 +78,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'headers': {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, X-User-Id',
+                'Access-Control-Allow-Headers': 'Content-Type, X-User-Id, X-User-Role',
                 'Access-Control-Max-Age': '86400'
             },
             'body': '',
@@ -99,16 +99,23 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     try:
         if method == 'GET':
+            headers = event.get('headers', {})
+            user_id = headers.get('X-User-Id')
+            user_role = headers.get('X-User-Role')
+            
             path_params = event.get('pathParams', {})
             booking_id = path_params.get('id')
             
             if booking_id:
                 cursor.execute(
-                    "SELECT id, name, phone, email, address, area, service_type, comment, status, "
-                    "TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI') as created_at, "
-                    "TO_CHAR(booking_date, 'YYYY-MM-DD') as booking_date, "
-                    "TO_CHAR(booking_time, 'HH24:MI') as booking_time "
-                    "FROM bookings WHERE id = " + str(int(booking_id))
+                    "SELECT b.id, b.name, b.phone, b.email, b.address, b.area, b.service_type, b.comment, b.status, "
+                    "TO_CHAR(b.created_at, 'YYYY-MM-DD HH24:MI') as created_at, "
+                    "TO_CHAR(b.booking_date, 'YYYY-MM-DD') as booking_date, "
+                    "TO_CHAR(b.booking_time, 'HH24:MI') as booking_time, "
+                    "b.assignee_id, u.full_name as assignee_name "
+                    "FROM t_p89410065_cleaning_service_web.bookings b "
+                    "LEFT JOIN t_p89410065_cleaning_service_web.users u ON b.assignee_id = u.id "
+                    "WHERE b.id = " + str(int(booking_id))
                 )
                 booking = cursor.fetchone()
                 if not booking:
@@ -125,13 +132,22 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             else:
-                cursor.execute(
-                    "SELECT id, name, phone, email, address, area, service_type, comment, status, "
-                    "TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI') as created_at, "
-                    "TO_CHAR(booking_date, 'YYYY-MM-DD') as booking_date, "
-                    "TO_CHAR(booking_time, 'HH24:MI') as booking_time "
-                    "FROM bookings ORDER BY created_at DESC"
+                base_query = (
+                    "SELECT b.id, b.name, b.phone, b.email, b.address, b.area, b.service_type, b.comment, b.status, "
+                    "TO_CHAR(b.created_at, 'YYYY-MM-DD HH24:MI') as created_at, "
+                    "TO_CHAR(b.booking_date, 'YYYY-MM-DD') as booking_date, "
+                    "TO_CHAR(b.booking_time, 'HH24:MI') as booking_time, "
+                    "b.assignee_id, u.full_name as assignee_name "
+                    "FROM t_p89410065_cleaning_service_web.bookings b "
+                    "LEFT JOIN t_p89410065_cleaning_service_web.users u ON b.assignee_id = u.id "
                 )
+                
+                if user_id and user_role not in ['super_admin', 'admin']:
+                    base_query += "WHERE b.assignee_id = " + str(int(user_id)) + " "
+                
+                base_query += "ORDER BY b.created_at DESC"
+                
+                cursor.execute(base_query)
                 bookings = cursor.fetchall()
                 return {
                     'statusCode': 200,
@@ -162,7 +178,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             cursor.execute(
-                "INSERT INTO bookings (name, phone, email, address, area, service_type, comment, status, booking_date, booking_time) "
+                "INSERT INTO t_p89410065_cleaning_service_web.bookings (name, phone, email, address, area, service_type, comment, status, booking_date, booking_time) "
                 "VALUES ('" + name.replace("'", "''") + "', '" + phone.replace("'", "''") + "', '" + 
                 email.replace("'", "''") + "', '" + address.replace("'", "''") + "', " + str(int(area)) + 
                 ", '" + service_type.replace("'", "''") + "', '" + comment.replace("'", "''") + "', 'new', '" + 
@@ -209,11 +225,33 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             body_data = json.loads(event.get('body', '{}'))
-            status = body_data.get('status', '')
+            status = body_data.get('status')
+            assignee_id = body_data.get('assignee_id')
+            
+            updates = []
+            if status:
+                updates.append("status = '" + status.replace("'", "''") + "'")
+            if assignee_id is not None:
+                if assignee_id == '':
+                    updates.append("assignee_id = NULL")
+                else:
+                    updates.append("assignee_id = " + str(int(assignee_id)))
+                    if status != 'assigned':
+                        updates.append("status = 'assigned'")
+            
+            if not updates:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'No fields to update'}),
+                    'isBase64Encoded': False
+                }
+            
+            updates.append("updated_at = CURRENT_TIMESTAMP")
             
             cursor.execute(
-                "UPDATE bookings SET status = '" + status.replace("'", "''") + 
-                "', updated_at = CURRENT_TIMESTAMP WHERE id = " + str(int(booking_id))
+                "UPDATE t_p89410065_cleaning_service_web.bookings SET " + ", ".join(updates) + 
+                " WHERE id = " + str(int(booking_id))
             )
             conn.commit()
             
@@ -237,7 +275,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
-            cursor.execute("DELETE FROM bookings WHERE id = " + str(int(booking_id)))
+            cursor.execute("DELETE FROM t_p89410065_cleaning_service_web.bookings WHERE id = " + str(int(booking_id)))
             conn.commit()
             
             return {

@@ -8,16 +8,20 @@ import BookingsTable from '@/components/admin/BookingsTable';
 import BookingDetailDialog from '@/components/admin/BookingDetailDialog';
 import DeleteConfirmDialog from '@/components/admin/DeleteConfirmDialog';
 import ServicesManager from '@/components/admin/ServicesManager';
-import { Booking, API_URL } from '@/components/admin/types';
+import UsersManager from '@/components/admin/UsersManager';
+import { Booking, User, API_URL, USERS_API_URL } from '@/components/admin/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<number>(1);
+  const [currentUserRole, setCurrentUserRole] = useState<string>('super_admin');
   const [activeTab, setActiveTab] = useState('bookings');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const { toast } = useToast();
@@ -25,7 +29,12 @@ export default function Admin() {
   const fetchBookings = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(API_URL);
+      const response = await fetch(API_URL, {
+        headers: {
+          'X-User-Id': currentUserId.toString(),
+          'X-User-Role': currentUserRole
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setBookings(data);
@@ -41,11 +50,24 @@ export default function Admin() {
     }
   };
 
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch(USERS_API_URL);
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+    }
+  };
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchBookings();
+      fetchUsers();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, currentUserId, currentUserRole]);
 
   const updateBookingStatus = async (id: number, newStatus: Booking['status']) => {
     try {
@@ -77,6 +99,55 @@ export default function Admin() {
       toast({
         title: 'Ошибка',
         description: 'Не удалось обновить статус',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const updateBookingAssignee = async (id: number, assigneeId: number | null) => {
+    try {
+      const response = await fetch(`${API_URL}?id=${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ assignee_id: assigneeId })
+      });
+
+      if (response.ok) {
+        const assignee = assigneeId ? users.find(u => u.id === assigneeId) : null;
+        setBookings(bookings.map(b => 
+          b.id === id ? { 
+            ...b, 
+            assignee_id: assigneeId, 
+            assignee_name: assignee?.full_name || null,
+            status: assigneeId ? 'assigned' : b.status
+          } : b
+        ));
+        toast({
+          title: 'Ответственный обновлён',
+          description: assigneeId ? 'Ответственный назначен' : 'Ответственный удалён'
+        });
+        if (selectedBooking && selectedBooking.id === id) {
+          setSelectedBooking({
+            ...selectedBooking,
+            assignee_id: assigneeId,
+            assignee_name: assignee?.full_name || null,
+            status: assigneeId ? 'assigned' : selectedBooking.status
+          });
+        }
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: 'Ошибка',
+          description: errorData.error || 'Не удалось обновить ответственного',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось обновить ответственного',
         variant: 'destructive'
       });
     }
@@ -118,6 +189,7 @@ export default function Admin() {
   const stats = {
     total: bookings.length,
     new: bookings.filter(b => b.status === 'new').length,
+    assigned: bookings.filter(b => b.status === 'assigned').length,
     inProgress: bookings.filter(b => b.status === 'in-progress').length,
     completed: bookings.filter(b => b.status === 'completed').length
   };
@@ -149,7 +221,7 @@ export default function Admin() {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+          <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-3">
             <TabsTrigger value="bookings" className="flex items-center gap-2">
               <Icon name="ClipboardList" size={18} />
               Заявки
@@ -158,12 +230,17 @@ export default function Admin() {
               <Icon name="Briefcase" size={18} />
               Услуги
             </TabsTrigger>
+            <TabsTrigger value="users" className="flex items-center gap-2">
+              <Icon name="Users" size={18} />
+              Пользователи
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="bookings" className="space-y-6">
             <StatsCards
               total={stats.total}
               newCount={stats.new}
+              assigned={stats.assigned}
               inProgress={stats.inProgress}
               completed={stats.completed}
             />
@@ -181,6 +258,10 @@ export default function Admin() {
           <TabsContent value="services">
             <ServicesManager />
           </TabsContent>
+
+          <TabsContent value="users">
+            <UsersManager currentUserRole={currentUserRole} />
+          </TabsContent>
         </Tabs>
       </main>
 
@@ -188,7 +269,10 @@ export default function Admin() {
         booking={selectedBooking}
         onClose={() => setSelectedBooking(null)}
         onStatusUpdate={updateBookingStatus}
+        onAssigneeUpdate={updateBookingAssignee}
         onDeleteClick={() => setShowDeleteConfirm(true)}
+        users={users}
+        currentUserRole={currentUserRole}
       />
 
       <DeleteConfirmDialog
