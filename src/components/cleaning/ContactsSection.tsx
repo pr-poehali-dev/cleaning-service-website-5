@@ -17,7 +17,7 @@ export default function ContactsSection({ isLoggedIn, setShowDashboard, setShowR
           <div className="space-y-2 sm:space-y-3 text-sm sm:text-base lg:text-lg">
             <p className="flex items-center justify-center gap-2">
               <Icon name="Phone" size={18} />
-              <span className="break-all">+7 (495) 123-45-67</span>
+              <span className="break-all">+7 (919) 707-12-18</span>
             </p>
             <p className="flex items-center justify-center gap-2">
               <Icon name="Mail" size={18} />
