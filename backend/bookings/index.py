@@ -6,6 +6,8 @@ from psycopg2.extras import RealDictCursor
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import urllib.request
+import urllib.parse
 
 def send_notification_email(booking_data: Dict[str, Any]) -> None:
     '''Отправка email уведомления администратору о новой заявке'''
@@ -60,6 +62,44 @@ def send_notification_email(booking_data: Dict[str, Any]) -> None:
         server.login(smtp_user, smtp_password)
         server.send_message(msg)
         server.quit()
+    except Exception as e:
+        pass
+
+def send_telegram_notification(booking_data: Dict[str, Any]) -> None:
+    '''Отправка уведомления в Telegram о новой заявке'''
+    bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
+    chat_id = os.environ.get('TELEGRAM_CHAT_ID')
+    
+    if not bot_token or not chat_id:
+        return
+    
+    message = f'''
+🆕 <b>Новая заявка на уборку #{booking_data["id"]}</b>
+
+👤 <b>Клиент:</b> {booking_data["name"]}
+📞 <b>Телефон:</b> {booking_data["phone"]}
+📧 <b>Email:</b> {booking_data["email"]}
+
+📍 <b>Адрес:</b> {booking_data["address"]}
+📏 <b>Площадь:</b> {booking_data["area"]} м²
+🧹 <b>Тип услуги:</b> {booking_data["service_type"]}
+
+📅 <b>Желаемая дата:</b> {booking_data.get("booking_date", "Не указана")}
+🕐 <b>Желаемое время:</b> {booking_data.get("booking_time", "Не указано")}
+
+💬 <b>Комментарий:</b> {booking_data.get("comment", "Нет комментария")}
+'''
+    
+    try:
+        url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
+        data = {
+            'chat_id': chat_id,
+            'text': message,
+            'parse_mode': 'HTML'
+        }
+        data_encoded = urllib.parse.urlencode(data).encode('utf-8')
+        req = urllib.request.Request(url, data=data_encoded)
+        urllib.request.urlopen(req)
     except Exception as e:
         pass
 
@@ -203,6 +243,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'booking_time': booking_time
             }
             send_notification_email(booking_notification_data)
+            send_telegram_notification(booking_notification_data)
             
             return {
                 'statusCode': 201,
