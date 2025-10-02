@@ -227,6 +227,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             body_data = json.loads(event.get('body', '{}'))
             status = body_data.get('status')
             assignee_id = body_data.get('assignee_id')
+            name = body_data.get('name')
+            phone = body_data.get('phone')
+            email = body_data.get('email')
+            address = body_data.get('address')
+            area = body_data.get('area')
+            service_type = body_data.get('service_type')
+            comment = body_data.get('comment')
+            booking_date = body_data.get('booking_date')
+            booking_time = body_data.get('booking_time')
             
             updates = []
             if status:
@@ -238,6 +247,24 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     updates.append("assignee_id = " + str(int(assignee_id)))
                     if status != 'assigned':
                         updates.append("status = 'assigned'")
+            if name:
+                updates.append("name = '" + name.replace("'", "''") + "'")
+            if phone:
+                updates.append("phone = '" + phone.replace("'", "''") + "'")
+            if email:
+                updates.append("email = '" + email.replace("'", "''") + "'")
+            if address:
+                updates.append("address = '" + address.replace("'", "''") + "'")
+            if area:
+                updates.append("area = " + str(int(area)))
+            if service_type:
+                updates.append("service_type = '" + service_type.replace("'", "''") + "'")
+            if comment is not None:
+                updates.append("comment = '" + comment.replace("'", "''") + "'")
+            if booking_date:
+                updates.append("booking_date = '" + booking_date.replace("'", "''") + "'")
+            if booking_time:
+                updates.append("booking_time = '" + booking_time.replace("'", "''") + "'")
             
             if not updates:
                 return {
