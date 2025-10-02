@@ -21,7 +21,7 @@ export default function ContactsSection({ isLoggedIn, setShowDashboard, setShowR
             </p>
             <p className="flex items-center justify-center gap-2">
               <Icon name="Mail" size={18} />
-              <span className="break-all">info@cleanpro.ru</span>
+              <span className="break-all"></span>
             </p>
             <p className="flex items-center justify-center gap-2">
               <Icon name="MapPin" size={18} />
