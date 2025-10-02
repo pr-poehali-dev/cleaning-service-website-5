@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,7 +23,9 @@ export default function UsersManager({ currentUserRole }: UsersManagerProps) {
   const [formData, setFormData] = useState({
     full_name: '',
     phone: '',
-    role: 'operator' as User['role']
+    role: 'operator' as User['role'],
+    login: '',
+    password: ''
   });
   const { toast } = useToast();
 
@@ -54,14 +58,18 @@ export default function UsersManager({ currentUserRole }: UsersManagerProps) {
       setFormData({
         full_name: user.full_name,
         phone: user.phone,
-        role: user.role
+        role: user.role,
+        login: user.login || '',
+        password: ''
       });
     } else {
       setEditingUser(null);
       setFormData({
         full_name: '',
         phone: '',
-        role: 'operator'
+        role: 'operator',
+        login: '',
+        password: ''
       });
     }
     setShowDialog(true);
@@ -73,7 +81,16 @@ export default function UsersManager({ currentUserRole }: UsersManagerProps) {
     if (!formData.full_name || !formData.phone || !formData.role) {
       toast({
         title: 'Ошибка',
-        description: 'Все поля обязательны для заполнения',
+        description: 'ФИО, телефон и роль обязательны для заполнения',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!editingUser && (!formData.login || !formData.password)) {
+      toast({
+        title: 'Ошибка',
+        description: 'Логин и пароль обязательны при создании пользователя',
         variant: 'destructive'
       });
       return;
@@ -214,49 +231,75 @@ export default function UsersManager({ currentUserRole }: UsersManagerProps) {
           <Icon name="Loader2" className="animate-spin text-primary" size={48} />
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {users.map((user) => (
-            <Card key={user.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                      <Icon name="User" className="text-primary" size={24} />
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">{user.full_name}</CardTitle>
-                      <CardDescription>{user.phone}</CardDescription>
-                    </div>
-                  </div>
-                </div>
-                <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium mt-2 ${getRoleColor(user.role)}`}>
-                  {getRoleLabel(user.role)}
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => handleOpenDialog(user)}
-                  >
-                    <Icon name="Pencil" size={16} className="mr-1" />
-                    Изменить
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-red-600 hover:text-red-700"
-                    onClick={() => handleDelete(user.id)}
-                  >
-                    <Icon name="Trash2" size={16} />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <Card>
+          <CardContent className="p-0">
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>ФИО</TableHead>
+                    <TableHead>Телефон</TableHead>
+                    <TableHead>Логин</TableHead>
+                    <TableHead>Роль</TableHead>
+                    <TableHead>Действия</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {users.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        Пользователи не найдены
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    users.map((user) => (
+                      <TableRow key={user.id} className="hover:bg-muted/50">
+                        <TableCell className="font-medium">#{user.id}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                              <Icon name="User" className="text-primary" size={16} />
+                            </div>
+                            <span className="font-medium">{user.full_name}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>{user.phone}</TableCell>
+                        <TableCell>
+                          <code className="text-sm bg-muted px-2 py-1 rounded">{user.login || '—'}</code>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className={getRoleColor(user.role)}>
+                            {getRoleLabel(user.role)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleOpenDialog(user)}
+                            >
+                              <Icon name="Pencil" size={16} />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-600 hover:text-red-700"
+                              onClick={() => handleDelete(user.id)}
+                            >
+                              <Icon name="Trash2" size={16} />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
@@ -290,6 +333,27 @@ export default function UsersManager({ currentUserRole }: UsersManagerProps) {
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   placeholder="+79991234567"
                   required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="login">Логин</Label>
+                <Input
+                  id="login"
+                  value={formData.login}
+                  onChange={(e) => setFormData({ ...formData, login: e.target.value })}
+                  placeholder="username"
+                  required={!editingUser}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Пароль {editingUser && <span className="text-muted-foreground text-sm">(оставьте пустым, если не хотите менять)</span>}</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  placeholder="••••••••"
+                  required={!editingUser}
                 />
               </div>
               <div className="space-y-2">
