@@ -1,5 +1,6 @@
 import json
 import os
+import hashlib
 from typing import Dict, Any
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -55,6 +56,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
     
+    password_hash = hashlib.sha256(password.encode()).hexdigest()
+    
     conn = psycopg2.connect(database_url)
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     
@@ -63,7 +66,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             "SELECT id, full_name, role, username "
             "FROM t_p89410065_cleaning_service_web.users "
             "WHERE username = '" + username.replace("'", "''") + "' "
-            "AND password_hash = '" + password.replace("'", "''") + "'"
+            "AND password_hash = '" + password_hash.replace("'", "''") + "'"
         )
         
         user = cursor.fetchone()
