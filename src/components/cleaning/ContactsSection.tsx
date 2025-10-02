@@ -25,7 +25,7 @@ export default function ContactsSection({ isLoggedIn, setShowDashboard, setShowR
             </p>
             <p className="flex items-center justify-center gap-2">
               <Icon name="MapPin" size={18} />
-              <span className="break-words">г. Москва, ул. Чистая, д. 15</span>
+              <span className="break-words">г. Пермь</span>
             </p>
             <p className="flex items-center justify-center gap-2">
               <Icon name="Clock" size={18} />
