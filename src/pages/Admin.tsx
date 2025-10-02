@@ -281,7 +281,7 @@ export default function Admin() {
           </TabsContent>
 
           <TabsContent value="services">
-            <ServicesManager />
+            <ServicesManager currentUserRole={currentUserRole} />
           </TabsContent>
 
           <TabsContent value="users">

@@ -35,7 +35,11 @@ const availableIcons = [
   'Hammer', 'Package', 'Car', 'TreePine', 'Droplet'
 ];
 
-export default function ServicesManager() {
+interface ServicesManagerProps {
+  currentUserRole: string;
+}
+
+export default function ServicesManager({ currentUserRole }: ServicesManagerProps) {
   const [services, setServices] = useState<Service[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
@@ -168,10 +172,12 @@ export default function ServicesManager() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold">Управление услугами</h2>
-        <Button onClick={() => handleOpenDialog()}>
-          <Icon name="Plus" size={18} className="mr-2" />
-          Добавить услугу
-        </Button>
+        {currentUserRole === 'super_admin' && (
+          <Button onClick={() => handleOpenDialog()}>
+            <Icon name="Plus" size={18} className="mr-2" />
+            Добавить услугу
+          </Button>
+        )}
       </div>
 
       {isLoading ? (
@@ -187,22 +193,24 @@ export default function ServicesManager() {
                   <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3">
                     <Icon name={service.icon as any} className="text-primary" size={24} />
                   </div>
-                  <div className="flex gap-2">
-                    <Button 
-                      size="sm" 
-                      variant="ghost"
-                      onClick={() => handleOpenDialog(service)}
-                    >
-                      <Icon name="Pencil" size={16} />
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="ghost"
-                      onClick={() => handleDelete(service.id)}
-                    >
-                      <Icon name="Trash2" size={16} className="text-destructive" />
-                    </Button>
-                  </div>
+                  {currentUserRole === 'super_admin' && (
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        onClick={() => handleOpenDialog(service)}
+                      >
+                        <Icon name="Pencil" size={16} />
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        onClick={() => handleDelete(service.id)}
+                      >
+                        <Icon name="Trash2" size={16} className="text-destructive" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 <CardTitle>{service.title}</CardTitle>
                 <CardDescription>{service.description}</CardDescription>
