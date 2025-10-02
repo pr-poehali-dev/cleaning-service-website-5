@@ -27,7 +27,7 @@ export default function HeroSection({ isLoggedIn, setShowDashboard, setShowRegis
               </Button>
               <Button size="default" variant="outline" className="text-sm sm:text-base w-full sm:w-auto">
                 <Icon name="Phone" size={18} className="mr-2" />
-                <span className="truncate">+7 (495) 123-45-67</span>
+                <span className="truncate">+7 (919) 707-12-18</span>
               </Button>
             </div>
           </div>
