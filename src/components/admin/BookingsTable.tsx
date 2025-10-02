@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -35,6 +36,8 @@ export default function BookingsTable({
   onStatusFilterChange,
   onViewBooking
 }: BookingsTableProps) {
+  const [dateFilter, setDateFilter] = useState<string>('');
+
   const filteredBookings = bookings.filter(booking => {
     const matchesSearch = 
       booking.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -43,7 +46,9 @@ export default function BookingsTable({
     
     const matchesStatus = statusFilter === 'all' || booking.status === statusFilter;
     
-    return matchesSearch && matchesStatus;
+    const matchesDate = !dateFilter || booking.booking_date === dateFilter;
+    
+    return matchesSearch && matchesStatus && matchesDate;
   });
 
   return (
@@ -64,18 +69,39 @@ export default function BookingsTable({
               className="w-full"
             />
           </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => onStatusFilterChange(e.target.value)}
-            className="px-4 py-2 rounded-md border border-input bg-background"
-          >
-            <option value="all">Все статусы</option>
-            <option value="new">Новые</option>
-            <option value="assigned">Назначена</option>
-            <option value="in-progress">В работе</option>
-            <option value="completed">Выполнено</option>
-            <option value="cancelled">Отменено</option>
-          </select>
+          <div className="flex gap-2">
+            <div className="relative">
+              <Input
+                type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="w-[180px]"
+                placeholder="Дата уборки"
+              />
+              {dateFilter && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setDateFilter('')}
+                  className="absolute right-0 top-0 h-full px-2"
+                >
+                  <Icon name="X" size={14} />
+                </Button>
+              )}
+            </div>
+            <select
+              value={statusFilter}
+              onChange={(e) => onStatusFilterChange(e.target.value)}
+              className="px-4 py-2 rounded-md border border-input bg-background"
+            >
+              <option value="all">Все статусы</option>
+              <option value="new">Новые</option>
+              <option value="assigned">Назначена</option>
+              <option value="in-progress">В работе</option>
+              <option value="completed">Выполнено</option>
+              <option value="cancelled">Отменено</option>
+            </select>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
