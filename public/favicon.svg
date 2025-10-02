@@ -1,23 +1,59 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="sparkleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#3b82f6;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
     </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#dbeafe;stop-opacity:0.7" />
+    </linearGradient>
+    <radialGradient id="glowGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#fff;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0" />
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
   
-  <!-- Main sparkle star -->
-  <path d="M256 32 L280 180 L428 156 L316 268 L428 380 L280 356 L256 504 L232 356 L84 380 L196 268 L84 156 L232 180 Z" 
-        fill="url(#sparkleGradient)" 
-        stroke="white" 
-        stroke-width="8" 
-        stroke-linejoin="round"/>
+  <!-- Outer glow effect -->
+  <circle cx="256" cy="256" r="180" fill="url(#glowGradient)" opacity="0.5"/>
   
-  <!-- Small accent sparkle top-right -->
-  <circle cx="380" cy="132" r="20" fill="white" opacity="0.9"/>
-  <path d="M380 100 L380 164 M348 132 L412 132" stroke="#3b82f6" stroke-width="6" stroke-linecap="round"/>
+  <!-- Main central sparkle star (8-pointed) -->
+  <path d="M256 60 L276 220 L340 140 L300 260 L420 220 L320 300 L440 340 L300 320 L340 440 L276 340 L256 500 L236 340 L172 440 L212 320 L92 340 L192 300 L72 220 L192 260 L152 140 L236 220 Z" 
+        fill="url(#mainGradient)" 
+        filter="url(#glow)"/>
   
-  <!-- Small accent sparkle bottom-left -->
-  <circle cx="132" cy="380" r="16" fill="white" opacity="0.8"/>
-  <path d="M132 368 L132 392 M120 380 L144 380" stroke="#06b6d4" stroke-width="5" stroke-linecap="round"/>
+  <!-- Inner white highlight -->
+  <path d="M256 140 L264 220 L300 180 L280 240 L340 220 L300 256 L340 280 L280 264 L300 324 L264 284 L256 364 L248 284 L212 324 L232 264 L172 280 L212 256 L172 220 L232 240 L212 180 L248 220 Z" 
+        fill="url(#accentGradient)" 
+        opacity="0.8"/>
+  
+  <!-- Top right sparkle accent -->
+  <g transform="translate(380, 120)" filter="url(#glow)">
+    <path d="M0 -24 L4 -4 L24 0 L4 4 L0 24 L-4 4 L-24 0 L-4 -4 Z" fill="#fff"/>
+    <circle cx="0" cy="0" r="8" fill="url(#mainGradient)"/>
+  </g>
+  
+  <!-- Bottom left sparkle accent -->
+  <g transform="translate(132, 392)" filter="url(#glow)">
+    <path d="M0 -20 L3 -3 L20 0 L3 3 L0 20 L-3 3 L-20 0 L-3 -3 Z" fill="#fff"/>
+    <circle cx="0" cy="0" r="6" fill="url(#mainGradient)"/>
+  </g>
+  
+  <!-- Top left small sparkle -->
+  <g transform="translate(120, 140)">
+    <path d="M0 -12 L2 -2 L12 0 L2 2 L0 12 L-2 2 L-12 0 L-2 -2 Z" fill="#60a5fa" opacity="0.8"/>
+  </g>
+  
+  <!-- Bottom right small sparkle -->
+  <g transform="translate(392, 372)">
+    <path d="M0 -12 L2 -2 L12 0 L2 2 L0 12 L-2 2 L-12 0 L-2 -2 Z" fill="#06b6d4" opacity="0.8"/>
+  </g>
 </svg>
