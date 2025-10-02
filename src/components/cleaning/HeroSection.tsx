@@ -9,15 +9,15 @@ interface HeroSectionProps {
 
 export default function HeroSection({ isLoggedIn, setShowDashboard, setShowRegisterDialog }: HeroSectionProps) {
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-hidden" itemScope itemType="https://schema.org/Service">
       <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10"></div>
       <div className="container mx-auto px-4 py-8 sm:py-12 lg:py-20 relative">
         <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
           <div className="animate-fade-in">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight" itemProp="name">
               Профессиональная уборка для вашего комфорта
-            </h2>
-            <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-8">
+            </h1>
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-8" itemProp="description">
               Современные технологии, экологичные средства и опытная команда для идеальной чистоты вашего пространства
             </p>
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
@@ -34,8 +34,11 @@ export default function HeroSection({ isLoggedIn, setShowDashboard, setShowRegis
           <div className="animate-scale-in order-first lg:order-last">
             <img
               src="https://cdn.poehali.dev/files/0c244d59-f0c1-4dff-b054-4e98efecce46.jpg"
-              alt="Профессиональная уборка"
+              alt="Профессиональная уборка квартир и офисов в Москве - Top Clean Service"
+              title="Клининговые услуги премиум класса"
               className="rounded-2xl shadow-2xl w-full h-auto object-cover max-h-[300px] sm:max-h-[400px] lg:max-h-none"
+              itemProp="image"
+              loading="eager"
             />
           </div>
         </div>

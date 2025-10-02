@@ -1,19 +1,22 @@
 export default function AboutSection() {
   return (
-    <section className="py-12 sm:py-16 lg:py-20">
+    <section id="about" className="py-12 sm:py-16 lg:py-20" itemScope itemType="https://schema.org/Organization">
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 items-center">
           <div className="animate-fade-in">
             <img
               src="https://cdn.poehali.dev/files/bdef7af6-032c-44ed-9508-e5ba24733ae0.jpg"
-              alt="Наша команда"
+              alt="Команда клининговой компании Top Clean Service"
+              title="Профессиональные клинеры"
               className="rounded-2xl shadow-xl w-full h-auto object-cover"
+              itemProp="image"
+              loading="lazy"
             />
           </div>
           <div>
-            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">О компании Top Clean Service</h3>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6" itemProp="name">О компании Top Clean Service</h2>
             <div className="space-y-3 sm:space-y-4 text-base sm:text-lg text-muted-foreground">
-              <p>
+              <p itemProp="description">
                 Мы — команда профессионалов с более чем 10-летним опытом в сфере клининговых услуг. 
                 Наша миссия — создавать идеально чистые пространства, где приятно жить и работать.
               </p>

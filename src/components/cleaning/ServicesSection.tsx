@@ -33,9 +33,9 @@ export default function ServicesSection() {
   }, []);
 
   return (
-    <section className="py-12 sm:py-16 lg:py-20 bg-white">
+    <section id="services" className="py-12 sm:py-16 lg:py-20 bg-white" itemScope itemType="https://schema.org/ServiceCatalog">
       <div className="container mx-auto px-4">
-        <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-8 sm:mb-10 lg:mb-12">Наши услуги</h3>
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-8 sm:mb-10 lg:mb-12">Наши услуги</h2>
         {isLoading ? (
           <div className="flex justify-center py-12">
             <Icon name="Loader2" className="animate-spin text-primary" size={48} />
@@ -43,16 +43,18 @@ export default function ServicesSection() {
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {services.map((service, idx) => (
-              <Card key={service.id} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in" style={{ animationDelay: `${idx * 100}ms` }}>
+              <Card key={service.id} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in" style={{ animationDelay: `${idx * 100}ms` }} itemScope itemType="https://schema.org/Service">
                 <CardHeader>
                   <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-primary/10 rounded-full flex items-center justify-center mb-3 sm:mb-4">
                     <Icon name={service.icon as any} className="text-primary" size={24} />
                   </div>
-                  <CardTitle className="text-lg sm:text-xl">{service.title}</CardTitle>
-                  <CardDescription className="text-sm">{service.description}</CardDescription>
+                  <CardTitle className="text-lg sm:text-xl" itemProp="name">{service.title}</CardTitle>
+                  <CardDescription className="text-sm" itemProp="description">{service.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-xl sm:text-2xl font-bold text-primary">{service.price}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-primary" itemProp="offers" itemScope itemType="https://schema.org/Offer">
+                    <span itemProp="price">{service.price}</span>
+                  </p>
                 </CardContent>
               </Card>
             ))}
