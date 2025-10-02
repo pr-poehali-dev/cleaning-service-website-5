@@ -19,6 +19,7 @@ export interface User {
   id: number;
   full_name: string;
   phone: string;
+  login?: string;
   role: 'super_admin' | 'admin' | 'manager' | 'operator';
   created_at?: string;
   updated_at?: string;
