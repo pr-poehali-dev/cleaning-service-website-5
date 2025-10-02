@@ -161,6 +161,45 @@ export default function Admin() {
     }
   };
 
+  const updateBookingData = async (id: number, data: Partial<Booking>) => {
+    try {
+      const response = await fetch(`${API_URL}?id=${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        await fetchBookings();
+        toast({
+          title: "Заявка обновлена",
+          description: "Изменения успешно сохранены",
+        });
+        if (selectedBooking && selectedBooking.id === id) {
+          setSelectedBooking({
+            ...selectedBooking,
+            ...data,
+          });
+        }
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Ошибка",
+          description: errorData.error || "Не удалось обновить заявку",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось обновить заявку",
+        variant: "destructive",
+      });
+    }
+  };
+
   const deleteBooking = async (id: number) => {
     try {
       const response = await fetch(`${API_URL}?id=${id}`, {
@@ -295,6 +334,7 @@ export default function Admin() {
         onClose={() => setSelectedBooking(null)}
         onStatusUpdate={updateBookingStatus}
         onAssigneeUpdate={updateBookingAssignee}
+        onUpdateBooking={updateBookingData}
         onDeleteClick={() => setShowDeleteConfirm(true)}
         users={users}
         currentUserRole={currentUserRole}

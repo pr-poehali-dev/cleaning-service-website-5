@@ -1,6 +1,10 @@
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { Booking, User } from './types';
 
@@ -10,6 +14,7 @@ interface BookingDetailDialogProps {
   onStatusUpdate: (id: number, status: Booking['status']) => void;
   onAssigneeUpdate: (id: number, assigneeId: number | null) => void;
   onDeleteClick: () => void;
+  onUpdateBooking: (id: number, data: Partial<Booking>) => void;
   users: User[];
   currentUserRole: string;
 }
@@ -20,44 +25,118 @@ export default function BookingDetailDialog({
   onStatusUpdate,
   onAssigneeUpdate,
   onDeleteClick,
+  onUpdateBooking,
   users,
   currentUserRole
 }: BookingDetailDialogProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState<Partial<Booking>>({});
+  const canEdit = ['super_admin', 'admin'].includes(currentUserRole);
+
+  useEffect(() => {
+    if (booking) {
+      setEditData({
+        name: booking.name,
+        phone: booking.phone,
+        email: booking.email,
+        address: booking.address,
+        area: booking.area,
+        service_type: booking.service_type,
+        booking_date: booking.booking_date,
+        booking_time: booking.booking_time,
+        comment: booking.comment
+      });
+      setIsEditing(false);
+    }
+  }, [booking]);
+
   if (!booking) return null;
+
+  const handleSave = () => {
+    onUpdateBooking(booking.id, editData);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditData({
+      name: booking.name,
+      phone: booking.phone,
+      email: booking.email,
+      address: booking.address,
+      area: booking.area,
+      service_type: booking.service_type,
+      booking_date: booking.booking_date,
+      booking_time: booking.booking_time,
+      comment: booking.comment
+    });
+    setIsEditing(false);
+  };
 
   return (
     <Dialog open={!!booking} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Icon name="FileText" className="text-primary" />
-            Заявка #{booking.id}
+          <DialogTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Icon name="FileText" className="text-primary" />
+              Заявка #{booking.id}
+            </div>
+            {canEdit && !isEditing && (
+              <Button size="sm" variant="outline" onClick={() => setIsEditing(true)}>
+                <Icon name="Pencil" size={16} className="mr-2" />
+                Редактировать
+              </Button>
+            )}
           </DialogTitle>
-          <DialogDescription>Детальная информация о заявке</DialogDescription>
+          <DialogDescription>
+            {isEditing ? 'Редактирование информации о заявке' : 'Детальная информация о заявке'}
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-6">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <h4 className="font-semibold mb-2 flex items-center gap-2">
+              <Label className="flex items-center gap-2 mb-2">
                 <Icon name="User" size={16} className="text-primary" />
                 Клиент
-              </h4>
-              <p className="text-lg">{booking.name}</p>
+              </Label>
+              {isEditing ? (
+                <Input
+                  value={editData.name || ''}
+                  onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                />
+              ) : (
+                <p className="text-lg">{booking.name}</p>
+              )}
             </div>
             <div>
-              <h4 className="font-semibold mb-2 flex items-center gap-2">
+              <Label className="flex items-center gap-2 mb-2">
                 <Icon name="Phone" size={16} className="text-primary" />
                 Телефон
-              </h4>
-              <p>{booking.phone}</p>
+              </Label>
+              {isEditing ? (
+                <Input
+                  value={editData.phone || ''}
+                  onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
+                />
+              ) : (
+                <p>{booking.phone}</p>
+              )}
             </div>
             <div>
-              <h4 className="font-semibold mb-2 flex items-center gap-2">
+              <Label className="flex items-center gap-2 mb-2">
                 <Icon name="Mail" size={16} className="text-primary" />
                 Email
-              </h4>
-              <p>{booking.email}</p>
+              </Label>
+              {isEditing ? (
+                <Input
+                  type="email"
+                  value={editData.email || ''}
+                  onChange={(e) => setEditData({ ...editData, email: e.target.value })}
+                />
+              ) : (
+                <p>{booking.email}</p>
+              )}
             </div>
             <div>
               <h4 className="font-semibold mb-2 flex items-center gap-2">
@@ -68,63 +147,104 @@ export default function BookingDetailDialog({
             </div>
           </div>
 
-          {(booking.booking_date || booking.booking_time) && (
-            <div className="bg-primary/5 p-4 rounded-lg">
-              <h4 className="font-semibold mb-3 flex items-center gap-2">
-                <Icon name="Clock" size={16} className="text-primary" />
-                Желаемое время уборки
-              </h4>
-              <div className="grid md:grid-cols-2 gap-4">
-                {booking.booking_date && (
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Дата</p>
-                    <p className="text-lg font-medium">{new Date(booking.booking_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                  </div>
+          <div className="bg-primary/5 p-4 rounded-lg">
+            <h4 className="font-semibold mb-3 flex items-center gap-2">
+              <Icon name="Clock" size={16} className="text-primary" />
+              Желаемое время уборки
+            </h4>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm mb-1">Дата</Label>
+                {isEditing ? (
+                  <Input
+                    type="date"
+                    value={editData.booking_date || ''}
+                    onChange={(e) => setEditData({ ...editData, booking_date: e.target.value })}
+                  />
+                ) : (
+                  <p className="text-lg font-medium">
+                    {booking.booking_date ? new Date(booking.booking_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}
+                  </p>
                 )}
-                {booking.booking_time && (
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Время</p>
-                    <p className="text-lg font-medium">{booking.booking_time}</p>
-                  </div>
+              </div>
+              <div>
+                <Label className="text-sm mb-1">Время</Label>
+                {isEditing ? (
+                  <Input
+                    type="time"
+                    value={editData.booking_time || ''}
+                    onChange={(e) => setEditData({ ...editData, booking_time: e.target.value })}
+                  />
+                ) : (
+                  <p className="text-lg font-medium">{booking.booking_time || '—'}</p>
                 )}
               </div>
             </div>
-          )}
+          </div>
 
           <div>
-            <h4 className="font-semibold mb-2 flex items-center gap-2">
+            <Label className="flex items-center gap-2 mb-2">
               <Icon name="MapPin" size={16} className="text-primary" />
               Адрес уборки
-            </h4>
-            <p>{booking.address}</p>
+            </Label>
+            {isEditing ? (
+              <Input
+                value={editData.address || ''}
+                onChange={(e) => setEditData({ ...editData, address: e.target.value })}
+              />
+            ) : (
+              <p>{booking.address}</p>
+            )}
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <h4 className="font-semibold mb-2 flex items-center gap-2">
+              <Label className="flex items-center gap-2 mb-2">
                 <Icon name="Maximize2" size={16} className="text-primary" />
                 Площадь
-              </h4>
-              <p>{booking.area} м²</p>
+              </Label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={editData.area || ''}
+                  onChange={(e) => setEditData({ ...editData, area: e.target.value })}
+                  placeholder="м²"
+                />
+              ) : (
+                <p>{booking.area} м²</p>
+              )}
             </div>
             <div>
-              <h4 className="font-semibold mb-2 flex items-center gap-2">
+              <Label className="flex items-center gap-2 mb-2">
                 <Icon name="Briefcase" size={16} className="text-primary" />
                 Тип услуги
-              </h4>
-              <p>{booking.service_type}</p>
+              </Label>
+              {isEditing ? (
+                <Input
+                  value={editData.service_type || ''}
+                  onChange={(e) => setEditData({ ...editData, service_type: e.target.value })}
+                />
+              ) : (
+                <p>{booking.service_type}</p>
+              )}
             </div>
           </div>
 
-          {booking.comment && (
-            <div>
-              <h4 className="font-semibold mb-2 flex items-center gap-2">
-                <Icon name="MessageSquare" size={16} className="text-primary" />
-                Комментарий
-              </h4>
-              <p className="text-muted-foreground">{booking.comment}</p>
-            </div>
-          )}
+          <div>
+            <Label className="flex items-center gap-2 mb-2">
+              <Icon name="MessageSquare" size={16} className="text-primary" />
+              Комментарий
+            </Label>
+            {isEditing ? (
+              <Textarea
+                value={editData.comment || ''}
+                onChange={(e) => setEditData({ ...editData, comment: e.target.value })}
+                rows={3}
+              />
+            ) : (
+              <p className="text-muted-foreground">{booking.comment || '—'}</p>
+            )}
+          </div>
 
           {['super_admin', 'admin'].includes(currentUserRole) && (
             <div>
@@ -197,15 +317,28 @@ export default function BookingDetailDialog({
             </div>
           </div>
 
-          <div className="pt-4 border-t">
-            <Button
-              variant="destructive"
-              onClick={onDeleteClick}
-              className="w-full"
-            >
-              <Icon name="Trash2" size={18} className="mr-2" />
-              Удалить заявку
-            </Button>
+          <div className="pt-4 border-t flex gap-3">
+            {isEditing ? (
+              <>
+                <Button onClick={handleSave} className="flex-1">
+                  <Icon name="Check" size={18} className="mr-2" />
+                  Сохранить изменения
+                </Button>
+                <Button variant="outline" onClick={handleCancel} className="flex-1">
+                  <Icon name="X" size={18} className="mr-2" />
+                  Отменить
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="destructive"
+                onClick={onDeleteClick}
+                className="w-full"
+              >
+                <Icon name="Trash2" size={18} className="mr-2" />
+                Удалить заявку
+              </Button>
+            )}
           </div>
         </div>
       </DialogContent>
