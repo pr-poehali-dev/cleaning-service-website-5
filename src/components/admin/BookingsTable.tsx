@@ -89,16 +89,17 @@ export default function BookingsTable({
                 <TableHead>Адрес</TableHead>
                 <TableHead>Площадь</TableHead>
                 <TableHead>Тип услуги</TableHead>
+                <TableHead>Желаемое время</TableHead>
                 <TableHead>Статус</TableHead>
                 <TableHead>Ответственный</TableHead>
-                <TableHead>Дата</TableHead>
+                <TableHead>Создана</TableHead>
                 <TableHead>Действия</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredBookings.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={11} className="text-center py-8 text-muted-foreground">
                     Заявки не найдены
                   </TableCell>
                 </TableRow>
@@ -116,6 +117,22 @@ export default function BookingsTable({
                     <TableCell className="max-w-[200px] truncate">{booking.address}</TableCell>
                     <TableCell>{booking.area} м²</TableCell>
                     <TableCell>{booking.service_type}</TableCell>
+                    <TableCell className="text-sm">
+                      {booking.booking_date || booking.booking_time ? (
+                        <div>
+                          {booking.booking_date && (
+                            <div className="font-medium">
+                              {new Date(booking.booking_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+                            </div>
+                          )}
+                          {booking.booking_time && (
+                            <div className="text-muted-foreground text-xs">{booking.booking_time}</div>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground text-xs">Не указано</span>
+                      )}
+                    </TableCell>
                     <TableCell>{getStatusBadge(booking.status)}</TableCell>
                     <TableCell className="text-sm">
                       {booking.assignee_name ? (
