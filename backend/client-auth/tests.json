@@ -1,0 +1,53 @@
+{
+  "tests": [
+    {
+      "name": "Регистрация нового клиента",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "register",
+        "full_name": "Иван Тестов",
+        "email": "test@example.com",
+        "phone": "+79001234567",
+        "login": "testuser",
+        "password": "testpass123"
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "id": 1,
+        "login": "testuser"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Вход существующего клиента",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "login",
+        "login": "testuser",
+        "password": "testpass123"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "login": "testuser"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Ошибка при неверном пароле",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "login",
+        "login": "testuser",
+        "password": "wrongpassword"
+      },
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

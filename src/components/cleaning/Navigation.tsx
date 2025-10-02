@@ -59,12 +59,12 @@ export default function Navigation({
                   </DialogHeader>
                   <form onSubmit={handleLogin} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="login-email">Email</Label>
-                      <Input id="login-email" type="email" placeholder="example@mail.com" required />
+                      <Label htmlFor="login-username">Логин</Label>
+                      <Input id="login-username" name="login" placeholder="Ваш логин" required />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="login-password">Пароль</Label>
-                      <Input id="login-password" type="password" required />
+                      <Input id="login-password" name="password" type="password" required />
                     </div>
                     <Button type="submit" className="w-full">Войти</Button>
                   </form>
@@ -82,20 +82,24 @@ export default function Navigation({
                   </DialogHeader>
                   <form onSubmit={handleRegister} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="reg-name">Имя</Label>
-                      <Input id="reg-name" placeholder="Иван Иванов" required />
+                      <Label htmlFor="reg-name">Полное имя</Label>
+                      <Input id="reg-name" name="full_name" placeholder="Иван Иванов" required />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="reg-email">Email</Label>
-                      <Input id="reg-email" type="email" placeholder="example@mail.com" required />
+                      <Input id="reg-email" name="email" type="email" placeholder="example@mail.com" required />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="reg-phone">Телефон</Label>
-                      <Input id="reg-phone" type="tel" placeholder="+7 (999) 123-45-67" required />
+                      <Input id="reg-phone" name="phone" type="tel" placeholder="+7 (999) 123-45-67" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="reg-login">Логин</Label>
+                      <Input id="reg-login" name="login" placeholder="Ваш логин" required />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="reg-password">Пароль</Label>
-                      <Input id="reg-password" type="password" required />
+                      <Input id="reg-password" name="password" type="password" required />
                     </div>
                     <Button type="submit" className="w-full">Зарегистрироваться</Button>
                   </form>
